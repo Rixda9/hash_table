@@ -1,0 +1,10 @@
+# compiled objects
+#
+*.o
+*.obj
+
+# executable
+#
+a.out 
+*.exe 
+*.bin

@@ -5,22 +5,6 @@
 
 #define HASH_SEED 5381UL
 
-typedef struct HT_Items {
-
-  char *key;
-  char *value;
-  struct HT_Items *next;
-
-} HT_Items;
-
-typedef struct HashTable {
-
-  size_t capacity;
-  size_t size;
-  HT_Items **items;
-
-} HashTable;
-
 // private helper
 static unsigned long hash_function(const char *str) {
   unsigned long hash = HASH_SEED;
@@ -133,4 +117,21 @@ void hash_table_delete(HashTable *ht, const char *key) {
   return;
 }
 
-void hash_table_destroy(HashTable *ht) {}
+void hash_table_destroy(HashTable *ht) {
+  for (size_t i = 0; i < ht->capacity; i++) {
+    HT_Items *current = ht->items[i];
+
+    while (current != NULL) {
+      HT_Items *next = current->next;
+
+      free(current->key);
+      free(current->value);
+      free(current);
+
+      current = next;
+    }
+  }
+  free(ht->items);
+
+  free(ht);
+}
