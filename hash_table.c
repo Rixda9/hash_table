@@ -56,13 +56,13 @@ void hash_table_insert(HashTable *ht, const char *key, const char *value) {
 
   HT_Items *new_item = malloc(sizeof(HT_Items));
   if (new_item == NULL) {
-    return NULL;
+    return;
   }
 
   new_item->key = malloc(strlen(key) + 1);
   if (new_item->key == NULL) {
     free(new_item);
-    return NULL;
+    return;
   }
   strcpy(new_item->key, key);
 
@@ -70,7 +70,7 @@ void hash_table_insert(HashTable *ht, const char *key, const char *value) {
   if (new_item->value == NULL) {
     free(new_item->key);
     free(new_item);
-    return NULL;
+    return;
   }
   strcpy(new_item->value, value);
 
@@ -101,6 +101,36 @@ char *hash_table_get(HashTable *ht, const char *key) {
   return NULL;
 }
 
-void hash_table_delete(HashTable *ht, const char *key) {}
+void hash_table_delete(HashTable *ht, const char *key) {
+
+  unsigned long hash_value = hash_function(key);
+
+  int index = hash_value % ht->capacity;
+
+  HT_Items *current = ht->items[index];
+  HT_Items *previous = NULL;
+
+  while (current != NULL) {
+    if (strcmp(current->key, key) == 0) {
+
+      free(current->key);
+      free(current->value);
+
+      if (previous == NULL) {
+        ht->items[index] = current->next;
+      } else {
+        previous->next = current->next;
+      }
+
+      free(current);
+      ht->size--;
+      return;
+    }
+    previous = current;
+    current = current->next;
+  }
+
+  return;
+}
 
 void hash_table_destroy(HashTable *ht) {}
